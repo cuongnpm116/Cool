@@ -1,0 +1,6 @@
+services:
+  cool.webapi:
+    image: ${DOCKER_REGISTRY-}coolwebapi
+    build:
+      context: .
+      dockerfile: Cool.WebApi/Dockerfile
