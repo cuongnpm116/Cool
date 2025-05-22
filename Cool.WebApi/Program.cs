@@ -1,25 +1,34 @@
+using Cool.WebApi.Extensions;
+using Jarvis.WebApi;
+using Jarvis.WebApi.Auth;
+using Jarvis.WebApi.Middlewares;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddMonitoring();
+builder.Services.AddCoreDefault(builder.Configuration);
+
+builder.Services
+    .AddHttpConnectionStringResolver()
+    .AddMasterContext()
+    .AddAppContext()
+    .AddServices()
+    .AddMultiTenancy();
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseCoreSwagger();
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+app.UseCoreAuth();
+
+app.UseMiddleware<ApiResponseWrapperMiddleware>();
 
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();
